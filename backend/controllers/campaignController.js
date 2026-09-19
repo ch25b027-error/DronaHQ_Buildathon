@@ -19,7 +19,6 @@ const getCampaigns = async (req, res) => {
 const triggerAgent = async (req, res) => {
   const { id } = req.params;
   const { agent_type } = req.body;
-  // Your agent triggering logic here
   res.json({ success: true, message: `Triggered ${agent_type} for campaign ${id}` });
 };
 

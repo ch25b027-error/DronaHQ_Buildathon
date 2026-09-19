@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { loginUser } from './utils/authServices';
 
 export default function Login() {
@@ -13,46 +13,51 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-
   const handleLogin = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError('');
     try {
       await loginUser(username, password);
       navigate('/');
     } catch (err) {
       setError('Invalid username or password');
+      setUsername('');
+      setPassword('');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen w-full flex bg-[#0B1519] text-slate-100 font-sans">
+    <div className="min-h-screen w-full flex bg-slate-50 text-slate-900 font-sans">
       
-      <div className="hidden md:flex flex-1 items-center justify-center ">
+      <div className="hidden md:flex flex-1 items-center justify-center">
         <div className="flex flex-wrap items-center gap-4 px-8">
           <img 
             src="/logo.png" 
-            alt="Company Logo" 
-            className="h-24 w-auto object-contain" 
+            alt="Company Logo"
+            className="h-24 rounded-2xl w-auto object-contain" 
           />
-          <h1 className="text-3xl font-medium tracking-wide">SDR Control</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-800">Buildathon</h1>
         </div>
       </div>
 
-      <div className="hidden md:block w-px h-[75vh] my-auto bg-slate-600/50"></div>
+      <div className="hidden md:block w-px h-[80vh] my-auto bg-blue-200"></div>
 
       <div className="flex flex-1 items-center justify-center p-8">
         <div className="w-full max-w-sm space-y-10">
           
-          <div className="text-center space-y-6">
-            <h2 className="text-4xl font-light tracking-wide text-white">Welcome</h2>
-            <p className="text-[10px] sm:text-xs uppercase tracking-[0.2em] text-slate-300">
+          <div className="text-center space-y-3">
+            <h2 className="text-4xl font-semibold tracking-tight text-slate-900">Welcome</h2>
+            <p className="text-sm text-slate-500">
               Please login to Dashboard with credentials.
             </p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
             {error && (
-              <div className="bg-red-950/50 border border-red-900 text-red-400 p-3 rounded text-sm text-center">
+              <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-md text-sm text-center">
                 {error}
               </div>
             )}
@@ -64,8 +69,8 @@ export default function Login() {
                   type="text" 
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="USERNAME"
-                  className="h-12 bg-white text-slate-900 rounded-sm border-0 focus-visible:ring-2 focus-visible:ring-orange-500 placeholder:text-slate-400 placeholder:tracking-wider text-sm tracking-wider px-4 shadow-none"
+                  placeholder="Username"
+                  className="h-12 bg-white text-slate-900 rounded-md border border-slate-300 focus-visible:ring-2 focus-visible:ring-sky-500 placeholder:text-slate-400 text-sm px-4 shadow-sm"
                   required
                 />
               </div>
@@ -76,8 +81,8 @@ export default function Login() {
                   type={showPassword ? "text" : "password"} 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="PASSWORD"
-                  className="h-12 bg-white text-slate-900 rounded-sm border-0 focus-visible:ring-2 focus-visible:ring-orange-500 placeholder:text-slate-400 placeholder:tracking-wider text-sm tracking-wider px-4 pr-12 shadow-none"
+                  placeholder="Password"
+                  className="h-12 bg-white text-slate-900 rounded-md border border-slate-300 focus-visible:ring-2 focus-visible:ring-sky-500 placeholder:text-slate-400 text-sm px-4 pr-12 shadow-sm"
                   required
                 />
                 <button
@@ -93,10 +98,17 @@ export default function Login() {
             <div className="pt-2">
               <Button 
                 type="submit" 
-                className="w-full h-12 bg-[#F26B22] hover:bg-[#D95B1A] text-white rounded-sm uppercase tracking-wider font-semibold border-0 transition-colors" 
+                className="w-full h-12 bg-sky-500 hover:bg-sky-600 hover:cursor-pointer text-gray-50 hover:text-white rounded-md font-semibold border-0 shadow-sm transition-colors flex items-center justify-center gap-2" 
                 disabled={isLoading}
               >
-                {isLoading ? "Logging in..." : "Login"}
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <span>Logging in...</span>
+                  </>
+                ) : (
+                  "Login"
+                )}
               </Button>
             </div>
           </form>

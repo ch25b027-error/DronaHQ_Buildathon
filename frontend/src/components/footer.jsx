@@ -35,14 +35,14 @@ export default function Footer() {
   ];
 
   const team = [
-    { role: "DB & Tech Lead", name: "Shivashankar", email: "shivashankar@example.com" },
-    { role: "AI Lead", name: "Agentic Engineer", email: "ai.lead@example.com" },
-    { role: "Product Lead", name: "Product Manager", email: "product.lead@example.com" },
+    { role: "Software", name: "Shivashankar", email: "shivashankar@example.com" },
+    { role: "AI", name: "Ishaan", email: "ai@example.com" },
+    { role: "Product", name: "Aashi", email: "product@example.com" },
   ];
 
   return (
-    <section className="bottom-0">
-      <footer className="w-full border-t border-slate-800 bottom-0 bg-[#0B1519] text-slate-400 font-sans text-xs">
+    <section className="bottom-0 mt-auto">
+      <footer className="w-full border-t border-slate-800 bg-slate-900 text-slate-200 font-sans text-xs">
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
             
@@ -67,11 +67,11 @@ export default function Footer() {
                       href={item.href}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition-colors text-xs"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-slate-900 border border-slate-800 text-slate-400 hover:text-sky-400 hover:border-sky-900 hover:bg-slate-900/80 transition-colors text-xs"
                     >
                       <Icon className="h-3.5 w-3.5" />
                       <span>{item.name}</span>
-                      <ExternalLink className="h-2.5 w-2.5 text-slate-500" />
+                      <ExternalLink className="h-2.5 w-2.5 opacity-70" />
                     </a>
                   );
                 })}
@@ -80,17 +80,17 @@ export default function Footer() {
 
             <div className="md:text-right space-y-3">
               <span className="text-sm font-medium text-slate-200 block">Engineering Team</span>
-              <div className="flex flex-col md:items-end gap-1.5 text-xs text-slate-400">
+              <div className="flex flex-wrap md:flex-col md:items-end gap-4 md:gap-2 text-xs text-slate-400">
                 {team.map((member) => (
-                  <div key={member.role} className="flex items-center gap-2">
-                    <span className="text-slate-500 font-mono text-[11px]">[{member.role}]</span>
+                  <div key={member.role} className="flex items-center gap-1.5 md:gap-2">
+                    <span className="text-slate-400 font-mono text-[11px]">[{member.role}]</span>
                     <span className="text-slate-300">{member.name}</span>
                     <a 
                       href={`mailto:${member.email}`} 
-                      className="text-slate-400 hover:text-[#F26B22] transition-colors inline-flex items-center"
+                      className="text-slate-400 hover:text-sky-400 transition-colors inline-flex items-center group"
                       title={`Email ${member.name}`}
                     >
-                      <Mail className="h-3.5 w-3.5 ml-1 inline text-slate-500 hover:text-[#F26B22]" />
+                      <Mail className="h-3.5 w-3.5 ml-1 inline group-hover:text-sky-400 transition-colors" />
                     </a>
                   </div>
                 ))}
@@ -99,12 +99,12 @@ export default function Footer() {
 
           </div>
 
-          <Separator className="my-6 bg-slate-800" />
+          <Separator className="my-6 bg-gray-700/80" />
 
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 text-slate-500 text-[11px]">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 text-slate-400 text-[11px]">
             <span>© 2026 Autonomous SDR Control Plane. All rights reserved.</span>
             <div className="flex items-center gap-2">
-              <span className="inline-block h-2 w-2 rounded-full bg-emerald-500"></span>
+              <span className="inline-block h-2 w-2 rounded-full bg-sky-500 shadow-[0_0_8px_rgba(14,165,233,0.6)]"></span>
               <span>All System Agents Operational</span>
             </div>
           </div>

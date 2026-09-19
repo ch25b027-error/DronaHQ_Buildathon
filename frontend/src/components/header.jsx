@@ -17,26 +17,25 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full bg-[#0e191e] border-b border-slate-800 text-slate-100 py-4 px-6 md:px-8 font-sans">
+    <header className="w-full bg-white border-b border-slate-200 text-slate-800 py-2 lg:py-3 px-6 md:px-8 font-sans">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5">
           <img 
             src="/logo.png" 
             alt="Company Logo" 
-            className="h-8 lg:h-10 w-auto object-contain" 
+            className="h-8 lg:h-10 rounded-lg w-auto object-contain" 
           />
-          <span className="text-xl font-medium tracking-wide text-white">SDR Control</span>
+          <span className="text-xl font-bold tracking-wide text-slate-900">Buildathon</span>
         </div>
 
         {token && !isLoginPage && (
           <Button 
-            variant="ghost" 
             onClick={handleLogout}
-            className="text-slate-400 hover:text-white hover:bg-slate-800/80 transition-colors"
+            className="bg-sky-500 hover:bg-sky-600 text-white font-medium px-4 h-10 shadow-sm transition-colors flex items-center gap-2"
           >
-            <LogOut className="w-4 h-4 mr-2" />
-            Logout
+            <LogOut className="w-4 h-4" />
+            <span>Logout</span>
           </Button>
         )}
         

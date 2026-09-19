@@ -7,15 +7,12 @@ const campaignRoutes = require('./routes/campaignRoutes');
 
 const app = express();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Mount Routes
-app.use('/api', authRoutes); // Public endpoints (Login)
-app.use('/api/campaigns', campaignRoutes); // Protected endpoints
+app.use('/api', authRoutes);
+app.use('/api/campaigns', campaignRoutes);
 
-// Error handling / Catch-all
 app.use((req, res) => {
   res.status(404).json({ success: false, message: 'Route not found' });
 });
