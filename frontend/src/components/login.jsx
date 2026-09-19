@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import axios from 'axios';
+import api from './utils/axios';
 
 export default function Login() {
   const [username, setUsername] = useState('');
@@ -13,7 +13,7 @@ export default function Login() {
     e.preventDefault();
     try {
       // Send credentials to your Node Express backend
-      const res = await axios.post('http://localhost:5000/api/login', { username, password });
+      const res = await api.post('/login', { username, password });
       
       if (res.data.token) {
         // Save the JWT in a cookie that expires in 1 day
