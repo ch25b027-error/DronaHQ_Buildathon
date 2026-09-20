@@ -1,4 +1,6 @@
 // backend/utils/emailSender.js
+const dns = require('dns');
+dns.setDefaultResultOrder('ipv4first'); // Forces IPv4 to prevent Render ENETUNREACH crash
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
