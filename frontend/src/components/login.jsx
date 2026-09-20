@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { loginUser } from './utils/authServices';
 import Header from './header';
@@ -31,55 +32,51 @@ export default function Login() {
   };
 
   return (
-    <div className='min-h-screen bg-slate-50 dark:bg-slate-950 gap-6 w-full flex flex-col transition-colors duration-200'>
+    <div className='min-h-screen bg-slate-50 dark:bg-slate-950 w-full flex flex-col transition-colors duration-200'>
       <Header />
-      <div className="w-full flex bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans flex-1 transition-colors duration-200">
-        
-        <div className="hidden md:flex flex-1 items-center justify-center">
-          <div className="flex flex-col items-center gap-4 px-8">
+      
+      <div className="flex-1 flex items-center justify-center p-4 sm:p-8">
+        <Card className="w-full max-w-[420px] p-8 md:p-10 shadow-lg border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl">
+          
+          <div className="flex flex-col items-center text-center space-y-2 mb-8">
             <img 
               src="/logo.png" 
-              alt="Company Logo"
-              className="h-18 lg:h-22 rounded-2xl w-auto object-contain" 
+              alt="Logo"
+              className="h-12 lg:h-13 rounded-lg w-auto object-contain mb-3" 
             />
-            <h1 className="text-4xl lg:text-5xl font-bold tracking-tight text-gray-800 dark:text-slate-100">Buildathon</h1>
-          </div>
-        </div>
-
-        <div className="hidden md:block w-px h-[80vh] my-auto bg-blue-200 dark:bg-slate-800 transition-colors"></div>
-
-        <div className="flex flex-1 items-center justify-center p-8">
-          <div className="w-full max-w-sm space-y-10">
-            
-            <div className="text-center space-y-3">
-              <h2 className="text-4xl font-semibold tracking-tight text-slate-900 dark:text-white">Welcome</h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400">
-                Please login to Dashboard with credentials.
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">SDR Control</h1>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                Autonomous outreach, managed
               </p>
             </div>
+          </div>
 
-            <form onSubmit={handleLogin} className="space-y-6" autoComplete="off">
-              {error && (
-                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 p-3 rounded-md text-sm text-center transition-colors">
-                  {error}
-                </div>
-              )}
+          <form onSubmit={handleLogin} className="space-y-6" autoComplete="off">
+            {error && (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm text-center transition-colors">
+                {error}
+              </div>
+            )}
 
-              <div className="space-y-4">
-                <div>
-                  <Input 
-                    id="username"
-                    name="username"
-                    type="text" 
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Username"
-                    autoComplete="off" // Disables username autofill
-                    className="h-12 bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-md border border-slate-300 dark:border-slate-800 focus-visible:ring-2 focus-visible:ring-sky-500 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-md px-4 shadow-sm transition-colors"
-                    required
-                  />
-                </div>
+            <div className="space-y-5">
+              <div className="space-y-2 text-left">
+                <label className="text-sm font-semibold text-slate-900 dark:text-slate-200" htmlFor="username">Email</label>
+                <Input 
+                  id="username"
+                  name="username"
+                  type="text" 
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="you@company.com"
+                  autoComplete="off"
+                  className="h-11 bg-white dark:bg-slate-950 text-slate-900 dark:text-white rounded-lg border-slate-200 dark:border-slate-800 focus-visible:ring-2 focus-visible:ring-sky-500 placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-sm transition-colors"
+                  required
+                />
+              </div>
 
+              <div className="space-y-2 text-left">
+                <label className="text-sm font-semibold text-slate-900 dark:text-slate-200" htmlFor="password">Password</label>
                 <div className="relative">
                   <Input 
                     id="password"
@@ -87,9 +84,9 @@ export default function Login() {
                     type={showPassword ? "text" : "password"} 
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Password"
-                    autoComplete="new-password" // This is the trick to stop password managers from injecting
-                    className="h-12 bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-md border border-slate-300 dark:border-slate-800 focus-visible:ring-2 focus-visible:ring-sky-500 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-md px-4 pr-12 shadow-sm transition-colors"
+                    placeholder="••••••••"
+                    autoComplete="new-password"
+                    className="h-11 bg-white dark:bg-slate-950 text-slate-900 dark:text-white rounded-lg border-slate-200 dark:border-slate-800 focus-visible:ring-2 focus-visible:ring-sky-500 placeholder:text-slate-400 dark:placeholder:text-slate-500 pr-12 shadow-sm transition-colors"
                     required
                   />
                   <button
@@ -101,28 +98,24 @@ export default function Login() {
                   </button>
                 </div>
               </div>
+            </div>
 
-              <div className="pt-2">
-                <Button 
-                  type="submit" 
-                  className="w-full h-12 bg-sky-500 hover:bg-sky-600 hover:cursor-pointer text-gray-50 hover:text-white rounded-md font-semibold border-0 shadow-sm transition-colors flex items-center justify-center gap-2" 
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                      <span>Logging in...</span>
-                    </>
-                  ) : (
-                    "Login"
-                  )}
-                </Button>
-              </div>
-            </form>
-
-          </div>
-        </div>
-        
+            <Button 
+              type="submit" 
+              className="w-full h-11 bg-sky-500 hover:bg-sky-600 text-white rounded-lg font-semibold shadow-sm transition-colors flex items-center justify-center gap-2" 
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <span>Signing in...</span>
+                </>
+              ) : (
+                "Sign in"
+              )}
+            </Button>
+          </form>
+        </Card>
       </div>
     </div>
   );

@@ -1,5 +1,3 @@
-// backend/utils/enrichmentToIcp.js
-
 const STATUSES = new Set(["enriched", "partial", "insufficient_data"]);
 const PROFILE_FIELDS = [
   "company_description", "industry", "hq_country", "employee_count",
@@ -12,7 +10,6 @@ const KEY_FIELDS = [
 const UNKNOWN = "unknown";
 const UNKNOWN_WORDS = new Set(["", "unknown", "n/a", "none", "null", "not provided"]);
 
-// Enricher field name -> ICP Prospect field name
 const ICP_FIELD_MAP = {
   "industry": "industry",
   "hq_country": "hq_country",

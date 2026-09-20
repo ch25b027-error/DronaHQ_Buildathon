@@ -17,7 +17,7 @@ const updateApproval = async (req, res) => {
     const { id } = req.params;
     const { status, draft_content, subject_line } = req.body; // status can be 'approved' or 'rejected'
 
-    // 1. Update database status
+    // Update database status
     const result = await pool.query(
       "UPDATE pending_drafts SET status = $1, draft_content = COALESCE($2, draft_content) WHERE id = $3 RETURNING *",
       [status, draft_content, id]
@@ -25,7 +25,7 @@ const updateApproval = async (req, res) => {
 
     const draft = result.rows[0];
 
-    // 2. UPDATE FUNNEL STAGE to 'Contacted' so metrics increase
+    // UPDATE FUNNEL STAGE to 'Contacted' so metrics increase
     if (status === 'approved' && draft) {
       await pool.query(
         `UPDATE campaign_prospects 
@@ -35,9 +35,8 @@ const updateApproval = async (req, res) => {
       );
     }
 
-    // 3. FIRE THE REAL EMAIL TO INBOX!
+    // FIRE THE REAL EMAIL TO INBOX!
     if (status === 'approved' && draft) {
-      // Create a dummy prospect email safely by stripping punctuation
       const cleanName = draft.prospect_name.replace(/[^a-zA-Z0-9]/g, '.').replace(/\.+/g, '.').toLowerCase();
       const cleanCompany = draft.prospect_company.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
       const mockEmail = `${cleanName}@${cleanCompany}.com`;

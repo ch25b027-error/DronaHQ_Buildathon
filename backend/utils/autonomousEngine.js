@@ -14,7 +14,6 @@ const runAutonomousCycle = async () => {
     }
 
     for (const campaign of liveCampaigns.rows) {
-      // Find prospects still stuck at 'Discovered'
       const prospectsQuery = await pool.query(`
         SELECT p.*, cp.prospect_id 
         FROM campaign_prospects cp
@@ -32,7 +31,6 @@ const runAutonomousCycle = async () => {
       const activeChannels = campaign.active_channels || "Email + LinkedIn";
       const isEmailEnabled = activeChannels.includes("Email");
 
-      // 1. Run Research Enricher
       const sourceData = [{ source: "fixture:crm", text: `${prospect.company} is a fast-growing tech company.` }];
       const campaignIcp = {
         criteria: [
@@ -56,7 +54,6 @@ const runAutonomousCycle = async () => {
       const icpPayload = prepareIcpCall(prospect, sourceData, enrichResult.data, campaignIcp, "1.0.0");
       let finalDecision = "needs_review";
 
-      // 2. Run ICP Fitment Agent
       let aiFitReason = "Qualified via baseline logic.";
       if (icpPayload.should_call_icp && enabledAgents.includes('ICP Fitment Agent')) {
         const icpResult = await callAgent({
@@ -71,20 +68,16 @@ const runAutonomousCycle = async () => {
         }
       }
 
-      // Save the AI's reasoning to the directory
       await pool.query(
         `UPDATE campaign_prospects SET ai_fit_reason = $1 WHERE campaign_id = $2 AND prospect_id = $3`,
         [aiFitReason, campaign.campaign_id, prospect.id]
       );
 
-      // If Email is completely disabled for this campaign, we don't process emails.
-      // (In a full app, we would branch to LinkedIn processing here instead)
       if (!isEmailEnabled) {
         console.log(`⏭️ [AI Engine] Skipping ${prospect.name} as Email channel is not selected.`);
         continue; 
       }
 
-      // 3. Run Personalisation Agent to draft the email!
       let emailBody = `Hi ${prospect.name}, caught your profile at ${prospect.company}. Let's connect!`;
       let subjectLine = `Scaling engineering at ${prospect.company}`;
 
@@ -105,7 +98,6 @@ const runAutonomousCycle = async () => {
         subjectLine = personalisationResult.data?.subject || subjectLine;
       }
 
-      // 4. CHECK IF HUMAN-IN-THE-LOOP IS ENABLED
       const settingsQuery = await pool.query("SELECT value FROM app_settings WHERE key = 'human_in_the_loop'");
       const hitlEnabled = settingsQuery.rows.length > 0 ? settingsQuery.rows[0].value === 'true' : true;
 

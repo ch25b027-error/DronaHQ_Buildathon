@@ -281,7 +281,7 @@ const testAgentPipeline = async (req, res) => {
   try {
     const { id } = req.params; // The campaign ID from the URL
 
-    // 1. Hardcoded Test Data (from Ishaan's Python file)
+    // Hardcoded Test Data (from Ishaan's Python file)
     const rawProspect = { name: "Asha Rao", title: "VP Engineering", company: "Lumen Freight" };
     const sourceData = [
       { source: "fixture:crm", text: "Lumen Freight has 120 employees. B2B SaaS for freight brokers." },
@@ -297,7 +297,7 @@ const testAgentPipeline = async (req, res) => {
       url: process.env.AGENT_URL_ENRICH,
       key: process.env.AGENT_KEY_ENRICH,
       message: `Prospect (raw): ${JSON.stringify(rawProspect)}\nSource data: ${JSON.stringify(sourceData)}`,
-      fallback: { status: "insufficient_data" } // Fail-safe fallback
+      fallback: { status: "insufficient_data" }
     });
 
     if (!enrichResult.ok) {
@@ -305,7 +305,6 @@ const testAgentPipeline = async (req, res) => {
     }
 
     console.log("2. Normalizing AI Output in Code...");
-    // This strips hallucinations and formats the data for the next agent
     const icpPayload = prepareIcpCall(
       rawProspect, 
       sourceData, 
@@ -316,7 +315,7 @@ const testAgentPipeline = async (req, res) => {
 
     let finalDecision = "needs_review";
 
-    // 3. Call ICP Agent (Only if we have enough data to bother)
+    // Call ICP Agent (Only if we have enough data to bother)
     if (icpPayload.should_call_icp) {
       console.log("3. Calling ICP Fitment Agent...");
       const icpResult = await callAgent({
@@ -331,14 +330,14 @@ const testAgentPipeline = async (req, res) => {
       }
     }
 
-    // 4. Write the activity to the Database so it shows on the UI!
+    // Write the activity to the Database so it shows on the UI!
     const logMessage = `Processed Asha Rao: Enrichment ${icpPayload.log.status}, ICP Decision: ${finalDecision}`;
     await pool.query(
       'INSERT INTO agent_logs (campaign_id, agent_name, action_text) VALUES ($1, $2, $3)',
       [id, 'Pipeline Test', logMessage]
     );
 
-    // 5. Return the full trace to the browser/Postman
+    // Return the full trace to the browser/Postman
     res.json({
       success: true,
       message: "Pipeline executed successfully!",
