@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
-import api from './utils/axios'; // Adjust path to where you saved the axios config
+import api from './utils/axios';
 import CampaignList from './dashboard/CampaignList';
 import CampaignDetail from './dashboard/CampaignDetail';
 import CampaignForm from './dashboard/CampaignForm';
@@ -60,6 +60,24 @@ export default function Dashnboard() {
     setSelectedCampaign(null);
   };
 
+  const handleToggleStatus = async (campaignId, newStatus) => {
+    try {
+      await api.patch(`/campaigns/${campaignId}/status`, { status: newStatus });
+      
+      // Update the UI instantly without reloading the page
+      setCampaigns(prevCampaigns => 
+        prevCampaigns.map(c => c.id === campaignId ? { ...c, status: newStatus } : c)
+      );
+      
+      // Also update the detail view if it's currently open
+      if (selectedCampaign && selectedCampaign.id === campaignId) {
+        setSelectedCampaign(prev => ({ ...prev, status: newStatus }));
+      }
+    } catch (err) {
+      console.error("Error updating status:", err);
+    }
+  };
+
   // Post the form data to backend using Axios
   const handleSave = async (formData, isDraft = false) => {
     try {
@@ -81,22 +99,24 @@ export default function Dashnboard() {
     }
   };
 
+  // Inside your component, update the loading return:
   if (isLoading) {
     return (
-      <div className="max-w-[1400px] mx-auto min-h-[85vh] flex flex-col items-center justify-center bg-slate-50">
+      <div className="max-w-screen mx-auto min-h-[85vh] flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950">
         <Loader2 className="h-8 w-8 animate-spin text-sky-500 mb-4" />
         <p className="text-slate-500 text-sm">Loading campaigns...</p>
       </div>
     );
   }
 
+  // Update the main return wrapper:
   return (
-    <div className="max-w-[1400px] mx-auto p-6 md:p-8 font-sans bg-slate-50 min-h-[85vh]">
+    <div className="max-w-screen mx-auto p-6 md:p-8 font-sans bg-slate-50 dark:bg-slate-950 min-h-[85vh] transition-colors duration-200">
       {currentView === 'list' && (
-        <CampaignList campaigns={campaigns} onSelect={handleSelect} onNew={handleNew} />
+        <CampaignList campaigns={campaigns} onSelect={handleSelect} onNew={handleNew} onToggleStatus={handleToggleStatus}/>
       )}
       {currentView === 'detail' && selectedCampaign && (
-        <CampaignDetail campaign={selectedCampaign} onBack={handleBack} onEdit={() => handleEdit(selectedCampaign)} />
+        <CampaignDetail campaign={selectedCampaign} onBack={handleBack} onEdit={() => handleEdit(selectedCampaign)} onToggleStatus={handleToggleStatus}/>
       )}
       {currentView === 'form' && (
         <CampaignForm campaign={selectedCampaign} onCancel={selectedCampaign ? () => setCurrentView('detail') : handleBack} onSave={handleSave} />

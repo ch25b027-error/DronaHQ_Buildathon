@@ -5,7 +5,8 @@ const {
   createCampaign, 
   triggerAgent, 
   getCampaignById, 
-  updateCampaign 
+  updateCampaign,
+  updateCampaignStatus
 } = require('../controllers/campaignController');
 const verifyToken = require('../middleware/middleware');
 
@@ -15,6 +16,7 @@ router.get('/', getCampaigns);
 router.post('/', createCampaign);
 router.get('/:id', getCampaignById); // Fetch single campaign
 router.put('/:id', updateCampaign);  // Update campaign
+router.patch('/:id/status', updateCampaignStatus);
 router.post('/:id/trigger-agent', triggerAgent);
 
 module.exports = router;

@@ -87,5 +87,23 @@ const updateCampaign = async (req, res) => {
   }
 };
 
-// Update your exports at the bottom:
-module.exports = { getCampaigns, triggerAgent, createCampaign, getCampaignById, updateCampaign };
+const updateCampaignStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    
+    const result = await pool.query(
+      'UPDATE campaigns SET status = $1 WHERE campaign_id = $2 RETURNING *',
+      [status, id]
+    );
+    
+    res.json({ success: true, data: result.rows[0] });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// Add updateCampaignStatus to your exports
+module.exports = { 
+  getCampaigns, triggerAgent, createCampaign, getCampaignById, updateCampaign, updateCampaignStatus 
+};
