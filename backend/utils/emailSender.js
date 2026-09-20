@@ -1,34 +1,29 @@
 // backend/utils/emailSender.js
-const dns = require('dns');
-dns.setDefaultResultOrder('ipv4first'); // Forces IPv4 to prevent Render ENETUNREACH crash
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  },
-  family: 4 // This prevents the IPv6 crash on Render
-});
-
+// Fallback just in case you haven't added the key yet to prevent crashes
+const resend = new Resend('re_dummy_key');
 
 const sendDemoEmail = async ({ toEmail, subject, content }) => {
   try {
-    const mailOptions = {
-      from: `"Autonomous AI SDR" <${process.env.EMAIL_USER}>`,
-      to: toEmail, // Sends to the fake prospect directly
+    const { data, error } = await resend.emails.send({
+      // Resend's free tier requires sending FROM this specific onboarding address
+      from: 'Autonomous SDR <onboarding@resend.dev>', 
+      // Resend's free tier requires sending TO the email address you signed up with
+      to: [process.env.EMAIL_USER], 
       subject: subject || "AI Outreach Draft",
-      text: content
-    };
+      html: `<p><strong>[DEMO ROUTED FROM: ${toEmail}]</strong></p><p>${content.replace(/\n/g, '<br/>')}</p>`
+    });
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log("Email sent successfully: ", info.messageId);
-    return { success: true, messageId: info.messageId };
+    if (error) {
+      console.error("Resend API Error:", error);
+      return { success: false, error: error.message };
+    }
+
+    console.log("Email sent via Resend successfully: ", data.id);
+    return { success: true, messageId: data.id };
   } catch (error) {
-    console.error("Error sending email:", error);
+    console.error("Exception during email send:", error);
     return { success: false, error: error.message };
   }
 };
