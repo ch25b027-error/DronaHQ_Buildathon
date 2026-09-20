@@ -26,3 +26,17 @@ app.listen(PORT, () => {
   
   startEngine(); 
 });
+
+app.get('/api/cron/run-agents', async (req, res) => {
+  try {
+    console.log("Cron job triggered agent engine...");
+    
+    // Trigger the SDR campaigns
+    await startEngine(); 
+    
+    res.status(200).json({ success: true, message: "Engine executed successfully" });
+  } catch (error) {
+    console.error("Engine failed during cron execution:", error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
