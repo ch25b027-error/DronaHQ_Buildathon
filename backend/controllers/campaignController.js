@@ -259,6 +259,24 @@ const getCampaignIntelligence = async (req, res) => {
   }
 };
 
+const getCampaignProspects = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const query = `
+      SELECT p.id, p.name, p.title, p.company, p.linkedin_url, cp.funnel_stage, cp.ai_fit_reason
+      FROM prospects p
+      JOIN campaign_prospects cp ON p.id = cp.prospect_id
+      WHERE cp.campaign_id = $1
+      ORDER BY p.name ASC
+    `;
+    const result = await pool.query(query, [id]);
+    res.json({ success: true, data: result.rows });
+  } catch (err) {
+    console.error("Error fetching prospects:", err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
 const testAgentPipeline = async (req, res) => {
   try {
     const { id } = req.params; // The campaign ID from the URL
@@ -338,5 +356,5 @@ const testAgentPipeline = async (req, res) => {
 };
 
 module.exports = { 
-  getCampaigns, triggerAgent, createCampaign, getCampaignById, updateCampaign, updateCampaignStatus, globalPause, getCampaignIntelligence, testAgentPipeline 
+  getCampaigns, triggerAgent, createCampaign, getCampaignById, updateCampaign, updateCampaignStatus, globalPause, getCampaignIntelligence, getCampaignProspects, testAgentPipeline 
 };

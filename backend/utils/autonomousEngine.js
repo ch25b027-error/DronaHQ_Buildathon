@@ -57,15 +57,25 @@ const runAutonomousCycle = async () => {
       let finalDecision = "needs_review";
 
       // 2. Run ICP Fitment Agent
+      let aiFitReason = "Qualified via baseline logic.";
       if (icpPayload.should_call_icp && enabledAgents.includes('ICP Fitment Agent')) {
         const icpResult = await callAgent({
           url: process.env.AGENT_URL_ICP,
           key: process.env.AGENT_KEY_ICP,
           message: icpPayload.message,
-          fallback: { decision: "needs_review" }
+          fallback: { decision: "needs_review", reason: "Matched on target roles." }
         });
-        if (icpResult.ok && icpResult.data.decision) finalDecision = icpResult.data.decision;
+        if (icpResult.ok) {
+          if (icpResult.data.decision) finalDecision = icpResult.data.decision;
+          if (icpResult.data.reason) aiFitReason = icpResult.data.reason;
+        }
       }
+
+      // Save the AI's reasoning to the directory
+      await pool.query(
+        `UPDATE campaign_prospects SET ai_fit_reason = $1 WHERE campaign_id = $2 AND prospect_id = $3`,
+        [aiFitReason, campaign.campaign_id, prospect.id]
+      );
 
       // If Email is completely disabled for this campaign, we don't process emails.
       // (In a full app, we would branch to LinkedIn processing here instead)
@@ -151,7 +161,7 @@ const runAutonomousCycle = async () => {
 
 const startEngine = () => {
   console.log("🚀 Autonomous AI SDR Engine Initialized with Nodemailer integration.");
-  setInterval(runAutonomousCycle, 1 * 60 * 1000); // Checks every 15 minutes
+  setInterval(runAutonomousCycle, 10 * 60 * 1000); // Checks every 15 minutes
 };
 
 module.exports = { startEngine };

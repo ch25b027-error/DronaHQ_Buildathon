@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, Loader2 } from 'lucide-react';
 import { getStatusColor, getStatusDot } from './CampaignList';
 import api from '../utils/axios';
+import ProspectTable from './ProspectTable';
 
 export default function CampaignDetail({ campaign, onBack, onEdit, onToggleStatus }) {
   const [aiData, setAiData] = useState({
@@ -257,8 +258,8 @@ export default function CampaignDetail({ campaign, onBack, onEdit, onToggleStatu
             </div>
           </>
         )}
-
       </div>
+
     </div>
   );
 }
