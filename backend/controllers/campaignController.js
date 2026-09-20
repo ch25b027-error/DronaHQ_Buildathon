@@ -66,7 +66,7 @@ const createCampaign = async (req, res) => {
   try {
     const { 
       name, owner, description, icp, geography, target_roles, 
-      target_role, target_industry, // <-- Added new form fields
+      target_role, target_industry, 
       company_criteria, exclusion_criteria, daily_contact_limit, status,
       agents, active_channels, value_proposition, agent_tone
     } = req.body;
@@ -74,7 +74,7 @@ const createCampaign = async (req, res) => {
     const query = `
       INSERT INTO campaigns (
         name, owner, description, icp, geography, target_roles, 
-        target_role, target_industry, // <-- Added to columns
+        target_role, target_industry,
         company_criteria, exclusion_criteria, daily_contact_limit, status,
         agents, active_channels, value_proposition, agent_tone
       )
@@ -89,8 +89,8 @@ const createCampaign = async (req, res) => {
       icp, 
       geography, 
       target_roles, 
-      target_role || '', // Added value
-      target_industry || '', // Added value
+      target_role || '', 
+      target_industry || '', 
       company_criteria, 
       exclusion_criteria, 
       daily_contact_limit, 
