@@ -2,7 +2,7 @@
 const { Resend } = require('resend');
 
 // Fallback just in case you haven't added the key yet to prevent crashes
-const resend = new Resend('re_dummy_key');
+const resend = new Resend(process.env.RESEND);
 
 const sendDemoEmail = async ({ toEmail, subject, content }) => {
   try {
