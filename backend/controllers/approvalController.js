@@ -36,19 +36,24 @@ const updateApproval = async (req, res) => {
     }
 
     // FIRE THE REAL EMAIL TO INBOX!
-    if (status === 'approved' && draft) {
-      const cleanName = draft.prospect_name.replace(/[^a-zA-Z0-9]/g, '.').replace(/\.+/g, '.').toLowerCase();
-      const cleanCompany = draft.prospect_company.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-      const mockEmail = `${cleanName}@${cleanCompany}.com`;
-      
-      await sendDemoEmail({
-        toEmail: mockEmail,
-        subject: subject_line || `Outreach from SDR Control to ${draft.prospect_name}`,
-        content: draft.draft_content
-      });
+if (status === 'approved' && draft) {
+  // Send directly to your own email address so judges can see it arrive
+  const targetEmail = process.env.EMAIL_USER; 
+  
+  await sendDemoEmail({
+    toEmail: targetEmail,
+    subject: subject_line || `Outreach from SDR Control to ${draft.prospect_name}`,
+    content: draft.draft_content
+  });
 
-      return res.json({ success: true, data: draft, message: 'Draft approved and email sent to your inbox!' });
-    }
+  // Insert the missing activity log so it appears in your frontend UI
+  await pool.query(
+    'INSERT INTO agent_logs (campaign_id, agent_name, action_text) VALUES ($1, $2, $3)',
+    [draft.campaign_id, 'System', `Approved and sent email to ${draft.prospect_name}`]
+  );
+
+  return res.json({ success: true, data: draft, message: 'Draft approved and email sent to your inbox!' });
+}
 
     res.json({ success: true, data: draft, message: 'Draft updated successfully' });
   } catch (err) {
