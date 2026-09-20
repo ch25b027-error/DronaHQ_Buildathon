@@ -153,7 +153,7 @@ const runAutonomousCycle = async () => {
 
 const startEngine = () => {
   console.log("🚀 Autonomous AI SDR Engine Initialized with Nodemailer integration.");
-  setInterval(runAutonomousCycle, 10 * 60 * 1000); // Checks every 15 minutes
+  setInterval(runAutonomousCycle, 1 * 60 * 1000); // Checks every 15 minutes
 };
 
 module.exports = { startEngine };
