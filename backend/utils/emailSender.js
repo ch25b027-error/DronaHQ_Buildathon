@@ -2,12 +2,16 @@
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
-  }
+  },
+  family: 4 // This prevents the IPv6 crash on Render
 });
+
 
 const sendDemoEmail = async ({ toEmail, subject, content }) => {
   try {
