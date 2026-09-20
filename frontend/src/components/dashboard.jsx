@@ -1,21 +1,44 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Loader2 } from 'lucide-react';
+import api from './utils/axios'; // Adjust path to where you saved the axios config
 import CampaignList from './dashboard/CampaignList';
 import CampaignDetail from './dashboard/CampaignDetail';
 import CampaignForm from './dashboard/CampaignForm';
 
-// Mock Data
-const initialCampaigns = [
-  { id: 1, name: "Enterprise Expansion", subtitle: "Existing customers, upsell", status: "Draft", prospects: 0, outreach: 0, meetings: 0 },
-  { id: 2, name: "EU Fintech Compliance", subtitle: "Heads of Compliance, EU fintech", status: "Completed", prospects: 410, outreach: 198, meetings: 14 },
-  { id: 3, name: "India BFSI CIO Outreach", subtitle: "BFSI CIOs, enterprise", status: "Paused", prospects: 642, outreach: 211, meetings: 11 },
-  { id: 4, name: "US SaaS CTO Outreach", subtitle: "SaaS CTOs, 50-500 employees", status: "Live", prospects: 1284, outreach: 426, meetings: 18 },
-  { id: 5, name: "Voice AI Founders", subtitle: "Founders at voice-AI startups", status: "Live", prospects: 389, outreach: 142, meetings: 9 },
-];
-
-export default function Dashboard() {
-  const [currentView, setCurrentView] = useState('list'); // 'list', 'detail', 'form'
-  const [campaigns, setCampaigns] = useState(initialCampaigns);
+export default function Dashnboard() {
+  const [currentView, setCurrentView] = useState('list');
+  const [campaigns, setCampaigns] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedCampaign, setSelectedCampaign] = useState(null);
+
+  // Fetch campaigns using Axios
+  useEffect(() => {
+    const fetchCampaigns = async () => {
+      try {
+        const response = await api.get('/campaigns');
+        if (response.data.success) {
+          const formattedData = response.data.data.map(c => ({
+            id: c.campaign_id,
+            name: c.name,
+            subtitle: "Target Audience", 
+            status: c.status || 'Draft',
+            prospects: parseInt(c.total_prospects) || 0,
+            outreach: 0, 
+            meetings: 0  
+          }));
+          setCampaigns(formattedData);
+        }
+      } catch (err) {
+        console.error("Network error fetching campaigns:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (currentView === 'list') {
+      fetchCampaigns();
+    }
+  }, [currentView]);
 
   const handleSelect = (campaign) => {
     setSelectedCampaign(campaign);
@@ -37,33 +60,42 @@ export default function Dashboard() {
     setSelectedCampaign(null);
   };
 
-  const handleSave = (savedCampaign) => {
-    // Logic to save/update campaign in backend goes here
-    setCurrentView(savedCampaign.id ? 'detail' : 'list');
+  // Post the form data to backend using Axios
+  const handleSave = async (formData, isDraft = false) => {
+    try {
+      formData.status = isDraft ? 'Draft' : 'Live';
+      
+      if (formData.id) {
+        // Future logic for PUT / update existing campaign
+      } else {
+        await api.post('/campaigns', formData);
+      }
+      
+      setCurrentView('list');
+    } catch (err) {
+      console.error("Error saving campaign", err);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="max-w-[1400px] mx-auto min-h-[85vh] flex flex-col items-center justify-center bg-slate-50">
+        <Loader2 className="h-8 w-8 animate-spin text-sky-500 mb-4" />
+        <p className="text-slate-500 text-sm">Loading campaigns...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-[1400px] mx-auto p-6 md:p-8 font-sans bg-slate-50 min-h-[85vh]">
       {currentView === 'list' && (
-        <CampaignList 
-          campaigns={campaigns} 
-          onSelect={handleSelect} 
-          onNew={handleNew} 
-        />
+        <CampaignList campaigns={campaigns} onSelect={handleSelect} onNew={handleNew} />
       )}
       {currentView === 'detail' && selectedCampaign && (
-        <CampaignDetail 
-          campaign={selectedCampaign} 
-          onBack={handleBack} 
-          onEdit={() => handleEdit(selectedCampaign)} 
-        />
+        <CampaignDetail campaign={selectedCampaign} onBack={handleBack} onEdit={() => handleEdit(selectedCampaign)} />
       )}
       {currentView === 'form' && (
-        <CampaignForm 
-          campaign={selectedCampaign} 
-          onCancel={selectedCampaign ? () => setCurrentView('detail') : handleBack} 
-          onSave={handleSave} 
-        />
+        <CampaignForm campaign={selectedCampaign} onCancel={selectedCampaign ? () => setCurrentView('detail') : handleBack} onSave={handleSave} />
       )}
     </div>
   );

@@ -22,4 +22,33 @@ const triggerAgent = async (req, res) => {
   res.json({ success: true, message: `Triggered ${agent_type} for campaign ${id}` });
 };
 
-module.exports = { getCampaigns, triggerAgent };
+const createCampaign = async (req, res) => {
+  try {
+    const { 
+      name, owner, description, icp, geography, target_roles, 
+      company_criteria, exclusion_criteria, daily_contact_limit, status 
+    } = req.body;
+
+    const query = `
+      INSERT INTO campaigns (
+        name, owner, description, icp, geography, target_roles, 
+        company_criteria, exclusion_criteria, daily_contact_limit, status
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      RETURNING *;
+    `;
+    
+    const values = [
+      name, owner, description, icp, geography, target_roles, 
+      company_criteria, exclusion_criteria, daily_contact_limit, status || 'Draft'
+    ];
+    
+    const result = await pool.query(query, values);
+    res.json({ success: true, data: result.rows[0] });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// Make sure to export it
+module.exports = { getCampaigns, triggerAgent, createCampaign };

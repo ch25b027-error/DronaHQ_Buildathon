@@ -17,7 +17,7 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full bg-[#0B1519] border-b border-slate-800 text-slate-100 py-3 px-6 font-sans">
+    <header className="w-full bg-[#0B1519] sticky top-0 shadow-xl z-50 border-b border-slate-800 text-slate-100 py-3 px-6 font-sans">
       <div className="max-w-[1400px] mx-auto flex items-center justify-between">
         
         {/* Left: Branding */}

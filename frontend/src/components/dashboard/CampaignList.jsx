@@ -170,13 +170,13 @@ export default function CampaignList({ campaigns, onSelect, onNew }) {
           </div>
 
           <Card className="shadow-sm border-slate-200 overflow-hidden bg-white">
-            {/* Header Row: Tightened padding (py-3) and white background */}
-            <div className="grid grid-cols-12 gap-4 px-4 py-3 border-b border-slate-100 bg-white text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-              <div className="col-span-5">Campaign</div>
-              <div className="col-span-2 text-center">Status</div>
-              <div className="col-span-1 text-right">Prospects</div>
-              <div className="col-span-2 text-right">Outreach</div>
-              <div className="col-span-2 text-right pr-2">Meetings</div>
+            {/* Header Row */}
+            <div className="flex items-center px-6 py-4 border-b border-slate-100 bg-white text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+              <div className="w-[35%]">Campaign</div>
+              <div className="w-[15%]">Status</div>
+              <div className="w-[15%] text-center">Prospects</div>
+              <div className="w-[15%] text-center">Outreach</div>
+              <div className="w-[20%] text-left pl-2">Meetings</div>
             </div>
             
             <div className="divide-y divide-slate-100">
@@ -189,31 +189,35 @@ export default function CampaignList({ campaigns, onSelect, onNew }) {
                   <div 
                     key={camp.id} 
                     onClick={() => onSelect(camp)}
-                    // Added 'group' and changed hover color to sky-50
-                    className="group grid grid-cols-12 gap-4 p-4 items-center hover:bg-sky-50 cursor-pointer transition-colors"
+                    className="flex items-center px-6 py-4 hover:bg-slate-50 cursor-pointer transition-colors bg-white"
                   >
-                    <div className="col-span-5">
-                      <div className="font-semibold text-slate-900">{camp.name}</div>
-                      <div className="text-xs text-slate-500 mt-0.5">{camp.subtitle}</div>
+                    <div className="w-[35%] pr-4">
+                      <div className="font-semibold text-slate-900 text-[15px]">{camp.name}</div>
+                      <div className="text-[13px] text-slate-500 mt-0.5">{camp.subtitle}</div>
                     </div>
-                    <div className="col-span-2 flex justify-center">
-                      <span className={`text-[11px] px-2.5 py-1 rounded-full flex items-center gap-1.5 font-medium ${getStatusColor(camp.status)}`}>
+                    <div className="w-[15%]">
+                      <span className={`text-[12px] px-2.5 py-1 rounded-full inline-flex items-center gap-1.5 font-medium ${getStatusColor(camp.status)}`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${getStatusDot(camp.status)}`}></span>
                         {camp.status}
                       </span>
                     </div>
-                    <div className="col-span-1 text-right font-semibold text-slate-900">{camp.prospects}</div>
-                    <div className="col-span-2 text-right font-semibold text-slate-900">{camp.outreach}</div>
-                    <div className="col-span-2 flex justify-between items-center pl-6">
-                      <span className="font-semibold text-slate-900">{camp.meetings}</span>
+                    <div className="w-[15%] text-center font-semibold text-slate-900 text-[15px]">{camp.prospects}</div>
+                    <div className="w-[15%] text-center font-semibold text-slate-900 text-[15px]">{camp.outreach}</div>
+                    <div className="w-[20%] flex justify-between items-center pl-2">
+                      <span className="font-semibold text-slate-900 text-[15px]">{camp.meetings}</span>
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        // Dynamic button styling based on row hover and 'Completed' state
-                        className={`ml-auto text-xs h-7 transition-colors ${
+                        className={`rounded-full px-5 h-8 text-sm font-medium transition-colors ${
                           camp.status === 'Completed' 
-                            ? 'border-transparent text-slate-400 bg-transparent hover:bg-transparent pointer-events-none' 
-                            : 'border-slate-200 text-slate-700 bg-white group-hover:border-sky-500 group-hover:text-sky-600 group-hover:bg-sky-50'
+                            ? 'border-transparent text-slate-300 bg-transparent hover:bg-transparent pointer-events-none shadow-none' 
+                            : camp.status === 'Draft'
+                            ? 'border-sky-500 text-sky-600 hover:bg-sky-50 bg-white'
+                            : camp.status === 'Live'
+                            ? 'border-amber-500 text-amber-600 hover:bg-amber-50 bg-white'
+                            : camp.status === 'Paused'
+                            ? 'border-emerald-500 text-emerald-600 hover:bg-emerald-50 bg-white'
+                            : 'border-slate-200 text-slate-700 bg-white hover:bg-slate-50'
                         }`}
                         onClick={(e) => {
                           e.stopPropagation();
