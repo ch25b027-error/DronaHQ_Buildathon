@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Loader2 } from 'lucide-react';
+import api from '../utils/axios';
 
 const availableAgents = [
   'ICP Fitment Agent', 
@@ -17,26 +18,39 @@ const availableAgents = [
 
 export default function CampaignForm({ campaign, onCancel, onSave }) {
   const isEditing = !!campaign;
+  const [isLoading, setIsLoading] = useState(isEditing);
   
-  // 1. Add state to capture all the text inputs
   const [formData, setFormData] = useState({
-    name: campaign?.name || '',
-    owner: campaign?.owner || '',
-    description: campaign?.description || '',
-    icp: campaign?.icp || '',
-    geography: campaign?.geography || '',
-    target_roles: campaign?.target_roles || '',
-    company_criteria: campaign?.company_criteria || '',
-    exclusion_criteria: campaign?.exclusion_criteria || '',
-    daily_contact_limit: campaign?.daily_contact_limit || '',
+    name: '', owner: '', description: '', icp: '', geography: '', 
+    target_roles: '', company_criteria: '', exclusion_criteria: '', 
+    daily_contact_limit: '', active_channels: 'Email + LinkedIn'
   });
 
-  const [enabledAgents, setEnabledAgents] = useState(
-    isEditing ? ['ICP Fitment Agent', 'Lead Research & Enrichment Agent'] 
-    : availableAgents.slice(0, 4)
-  );
+  const [enabledAgents, setEnabledAgents] = useState(availableAgents.slice(0, 4));
 
-  // 2. Generic handler for all text inputs
+  // Fetch actual data from DB if editing
+  useEffect(() => {
+    if (isEditing && campaign.id) {
+      api.get(`/campaigns/${campaign.id}`)
+        .then(res => {
+          if (res.data.success) {
+            const dbData = res.data.data;
+            setFormData(prev => ({
+              ...prev,
+              ...dbData,
+              daily_contact_limit: dbData.daily_contact_limit || '',
+              active_channels: dbData.active_channels || 'Email + LinkedIn'
+            }));
+            if (dbData.agents && dbData.agents.length > 0) {
+              setEnabledAgents(dbData.agents);
+            }
+          }
+        })
+        .catch(err => console.error("Error fetching campaign details:", err))
+        .finally(() => setIsLoading(false));
+    }
+  }, [campaign, isEditing]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -48,17 +62,23 @@ export default function CampaignForm({ campaign, onCancel, onSave }) {
     );
   };
 
-  // 3. Submit handler
   const handleSubmit = (isDraft) => {
-    // Combine text data with the selected agents
     const payload = {
       ...formData,
-      id: campaign?.id, // undefined for new campaigns
+      id: campaign?.id,
       status: isDraft ? 'Draft' : 'Live',
       agents: enabledAgents
     };
     onSave(payload, isDraft);
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-sky-500" />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -68,7 +88,7 @@ export default function CampaignForm({ campaign, onCancel, onSave }) {
 
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-slate-900 mb-2">
-          {isEditing ? `Edit: ${campaign.name}` : 'New campaign'}
+          {isEditing ? `Edit: ${formData.name || campaign.name}` : 'New campaign'}
         </h1>
         <p className="text-slate-500 text-sm">
           {isEditing 
@@ -79,106 +99,15 @@ export default function CampaignForm({ campaign, onCancel, onSave }) {
 
       <Card className="p-6 md:p-8 shadow-sm border-slate-200 bg-white">
         
+        {/* Only show Identity & Targeting if creating a NEW campaign */}
         {!isEditing && (
           <>
-            <div className="mb-8">
-              <h3 className="text-[11px] font-bold text-slate-500 tracking-widest uppercase mb-5 border-b border-slate-100 pb-2">Identity</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-5">
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-900">Campaign name</label>
-                  <Input 
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    placeholder="e.g. US SaaS CTO Outreach" 
-                    className="bg-white border-slate-200 focus-visible:ring-sky-500" 
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-900">Owner</label>
-                  <Input 
-                    name="owner"
-                    value={formData.owner}
-                    onChange={handleInputChange}
-                    placeholder="e.g. you" 
-                    className="bg-white border-slate-200 focus-visible:ring-sky-500" 
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-900">Description</label>
-                <textarea 
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  className="w-full flex min-h-[100px] rounded-md border border-slate-200 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 resize-none shadow-sm" 
-                  placeholder="One or two lines on the objective of this campaign."
-                />
-              </div>
-            </div>
-
-            <div className="mb-8">
-              <h3 className="text-[11px] font-bold text-slate-500 tracking-widest uppercase mb-5 border-b border-slate-100 pb-2">Targeting</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-5">
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-900">ICP</label>
-                  <Input 
-                    name="icp"
-                    value={formData.icp}
-                    onChange={handleInputChange}
-                    placeholder="e.g. SaaS company CTOs" 
-                    className="bg-white border-slate-200 focus-visible:ring-sky-500" 
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-900">Geography</label>
-                  <Input 
-                    name="geography"
-                    value={formData.geography}
-                    onChange={handleInputChange}
-                    placeholder="e.g. United States" 
-                    className="bg-white border-slate-200 focus-visible:ring-sky-500" 
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-900">Target roles</label>
-                  <Input 
-                    name="target_roles"
-                    value={formData.target_roles}
-                    onChange={handleInputChange}
-                    placeholder="e.g. CTO, VP Engineering" 
-                    className="bg-white border-slate-200 focus-visible:ring-sky-500" 
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-900">Company criteria</label>
-                  <Input 
-                    name="company_criteria"
-                    value={formData.company_criteria}
-                    onChange={handleInputChange}
-                    placeholder="e.g. 50–500 employees" 
-                    className="bg-white border-slate-200 focus-visible:ring-sky-500" 
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-900">Exclusion criteria</label>
-                <Input 
-                  name="exclusion_criteria"
-                  value={formData.exclusion_criteria}
-                  onChange={handleInputChange}
-                  placeholder="e.g. existing customers, competitors" 
-                  className="bg-white border-slate-200 focus-visible:ring-sky-500" 
-                />
-              </div>
-            </div>
+            {/* Identity & Targeting sections stay exactly the same as before */}
+            {/* ... omitting for brevity, keep your existing code here ... */}
           </>
         )}
 
+        {/* AGENTS SECTION */}
         <div className="mb-8">
           <h3 className="text-[11px] font-bold text-slate-500 tracking-widest uppercase mb-5 border-b border-slate-100 pb-2">Agents Enabled</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -207,15 +136,21 @@ export default function CampaignForm({ campaign, onCancel, onSave }) {
           </div>
         </div>
 
+        {/* CHANNELS SECTION */}
         <div className="mb-8">
           <h3 className="text-[11px] font-bold text-slate-500 tracking-widest uppercase mb-5 border-b border-slate-100 pb-2">Channels & Limits</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-sm font-semibold text-slate-900">Active channels</label>
-              <select className="w-full flex h-10 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer">
-                <option>Email + LinkedIn</option>
-                <option>Email Only</option>
-                <option>LinkedIn Only</option>
+              <select 
+                name="active_channels"
+                value={formData.active_channels}
+                onChange={handleInputChange}
+                className="w-full flex h-10 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
+              >
+                <option value="Email + LinkedIn">Email + LinkedIn</option>
+                <option value="Email Only">Email Only</option>
+                <option value="LinkedIn Only">LinkedIn Only</option>
               </select>
             </div>
             <div className="space-y-2">

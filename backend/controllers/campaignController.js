@@ -50,5 +50,42 @@ const createCampaign = async (req, res) => {
   }
 };
 
-// Make sure to export it
-module.exports = { getCampaigns, triggerAgent, createCampaign };
+const getCampaignById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query('SELECT * FROM campaigns WHERE campaign_id = $1', [id]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Campaign not found' });
+    }
+    
+    res.json({ success: true, data: result.rows[0] });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+const updateCampaign = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { agents, active_channels, daily_contact_limit, status } = req.body;
+
+    const query = `
+      UPDATE campaigns 
+      SET agents = $1, active_channels = $2, daily_contact_limit = $3, status = COALESCE($4, status)
+      WHERE campaign_id = $5
+      RETURNING *;
+    `;
+    
+    // Default agents to empty array if none selected
+    const values = [agents || [], active_channels, daily_contact_limit, status, id];
+    
+    const result = await pool.query(query, values);
+    res.json({ success: true, data: result.rows[0] });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// Update your exports at the bottom:
+module.exports = { getCampaigns, triggerAgent, createCampaign, getCampaignById, updateCampaign };

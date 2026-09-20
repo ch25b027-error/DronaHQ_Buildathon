@@ -66,12 +66,16 @@ export default function Dashnboard() {
       formData.status = isDraft ? 'Draft' : 'Live';
       
       if (formData.id) {
-        // Future logic for PUT / update existing campaign
+        // Edit existing campaign
+        await api.put(`/campaigns/${formData.id}`, formData);
       } else {
+        // Create new campaign
         await api.post('/campaigns', formData);
       }
       
+      // Force the component to re-render the list view and trigger the useEffect fetch
       setCurrentView('list');
+      setSelectedCampaign(null);
     } catch (err) {
       console.error("Error saving campaign", err);
     }
