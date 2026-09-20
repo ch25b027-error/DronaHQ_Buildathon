@@ -7,7 +7,8 @@ const getCampaigns = async (req, res) => {
   try {
     const query = `
       SELECT c.campaign_id, c.name, c.status, c.created_at, c.owner, c.icp,
-      COUNT(DISTINCT cp.prospect_id) AS total_prospects
+      COUNT(DISTINCT cp.prospect_id) AS total_prospects,
+      COUNT(DISTINCT CASE WHEN cp.funnel_stage IN ('Contacted', 'Engaged', 'Meeting', 'Opportunity') THEN cp.prospect_id END) AS outreach_sent
       FROM campaigns c
       LEFT JOIN campaign_prospects cp ON c.campaign_id = cp.campaign_id
       GROUP BY c.campaign_id ORDER BY c.created_at DESC;
@@ -204,9 +205,13 @@ const getCampaignIntelligence = async (req, res) => {
       time: v.status === 'active' ? `activated ${formatTimeAgo(new Date(v.created_at))}` : formatTimeAgo(new Date(v.created_at))
     }));
 
-    // Default Channel Data (Until channel tracking is added to schema)
+    const contactedCount = (stageCounts['Contacted'] || 0) + 
+                           (stageCounts['Engaged'] || 0) + 
+                           (stageCounts['Meeting'] || 0) + 
+                           (stageCounts['Opportunity'] || 0);
+
     const channelData = [
-      { label: 'Email', value: 0, max: 100 },
+      { label: 'Email', value: contactedCount, max: Math.max(100, contactedCount) },
       { label: 'LinkedIn', value: 0, max: 100 },
       { label: 'Calls', value: 0, max: 100 },
     ];

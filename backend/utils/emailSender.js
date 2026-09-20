@@ -11,15 +11,11 @@ const transporter = nodemailer.createTransport({
 
 const sendDemoEmail = async ({ toEmail, subject, content }) => {
   try {
-    // DEMO HACK: For the presentation, you can force all AI emails 
-    // to go to your own inbox so you can show the judges!
-    const demoRecipient = process.env.EMAIL_USER; 
-
     const mailOptions = {
       from: `"Autonomous AI SDR" <${process.env.EMAIL_USER}>`,
-      to: demoRecipient, // Sends to your inbox for the demo
+      to: toEmail, // Sends to the fake prospect directly
       subject: subject || "AI Outreach Draft",
-      text: `[DEMO ROUTED FROM: ${toEmail}]\n\n${content}`
+      text: content
     };
 
     const info = await transporter.sendMail(mailOptions);

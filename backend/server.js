@@ -5,6 +5,7 @@ require('dotenv').config();
 const authRoutes = require('./routes/authRoutes');
 const campaignRoutes = require('./routes/campaignRoutes');
 const approvalRoutes = require('./routes/approvalRoutes');
+const { startEngine } = require('./utils/autonomousEngine');
 
 const app = express();
 
@@ -22,4 +23,7 @@ app.use((req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  
+  // WAKE UP THE AUTONOMOUS AGENTS!
+  startEngine(); 
 });

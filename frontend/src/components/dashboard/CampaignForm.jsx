@@ -101,105 +101,105 @@ export default function CampaignForm({ campaign, onCancel, onSave }) {
         {!isEditing && (
           <>
             <div className="mb-8">
-              <h3 className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase mb-5 border-b border-slate-100 dark:border-slate-800/60 pb-2">Identity</h3>
+              <h3 className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase mb-6 border-b border-slate-100 dark:border-slate-800/60 pb-2">Identity</h3>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-5">
-                <div className="space-y-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                <div className="space-y-3">
                   <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Campaign name</label>
                   <Input 
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
                     placeholder="e.g. US SaaS CTO Outreach" 
-                    className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
+                    className="h-11 mt-1.5 md:mt-2.5  bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Owner</label>
                   <Input 
                     name="owner"
                     value={formData.owner}
                     onChange={handleInputChange}
                     placeholder="e.g. you" 
-                    className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
+                    className="h-11 mt-1.5 md:mt-2.5 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
                   />
                 </div>
               </div>
               
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Description</label>
                 <textarea 
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
-                  className="w-full flex min-h-[100px] rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 dark:text-white px-3 py-2 text-sm placeholder:text-slate-400 dark:placeholder:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 resize-none shadow-sm transition-colors" 
+                  className="w-full mt-1.5 md:mt-2.5 flex min-h-25 rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 dark:text-white px-3 py-3 text-sm placeholder:text-slate-400 dark:placeholder:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 resize-none shadow-sm transition-colors" 
                   placeholder="One or two lines on the objective of this campaign."
                 />
               </div>
             </div>
 
             <div className="mb-8">
-              <h3 className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase mb-5 border-b border-slate-100 dark:border-slate-800/60 pb-2">Targeting</h3>
+              <h3 className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase mb-6 border-b border-slate-100 dark:border-slate-800/60 pb-2">Targeting</h3>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-5">
-                <div className="space-y-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                <div className="space-y-3">
                   <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">ICP</label>
                   <Input 
                     name="icp"
                     value={formData.icp}
                     onChange={handleInputChange}
                     placeholder="e.g. SaaS company CTOs" 
-                    className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
+                    className="h-11 mt-1.5 md:mt-2.5 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Geography</label>
                   <Input 
                     name="geography"
                     value={formData.geography}
                     onChange={handleInputChange}
                     placeholder="e.g. United States" 
-                    className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
+                    className="h-11 mt-1.5 md:mt-2.5 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Target roles</label>
                   <Input 
                     name="target_roles"
                     value={formData.target_roles}
                     onChange={handleInputChange}
                     placeholder="e.g. CTO, VP Engineering" 
-                    className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
+                    className="h-11 mt-1.5 md:mt-2.5 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Company criteria</label>
                   <Input 
                     name="company_criteria"
                     value={formData.company_criteria}
                     onChange={handleInputChange}
                     placeholder="e.g. 50–500 employees" 
-                    className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
+                    className="h-11 mt-1.5 md:mt-2.5 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
                   />
                 </div>
               </div>
               
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Exclusion criteria</label>
                 <Input 
                   name="exclusion_criteria"
                   value={formData.exclusion_criteria}
                   onChange={handleInputChange}
                   placeholder="e.g. existing customers, competitors" 
-                  className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
+                  className="h-11 mt-1.5 md:mt-2.5 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
                 />
               </div>
             </div>
           </>
         )}
 
-        <div className="mb-8">
-          <h3 className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase mb-5 border-b border-slate-100 dark:border-slate-800/60 pb-2">Agents Enabled</h3>
+        <div className="mb-6">
+          <h3 className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase mb-6 border-b border-slate-100 dark:border-slate-800/60 pb-2">Agents Enabled</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {availableAgents.map(agent => {
               const isActive = enabledAgents.includes(agent);
@@ -227,29 +227,29 @@ export default function CampaignForm({ campaign, onCancel, onSave }) {
         </div>
 
         <div className="mb-8">
-          <h3 className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase mb-5 border-b border-slate-100 dark:border-slate-800/60 pb-2">Channels & Limits</h3>
+          <h3 className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase mb-6 border-b border-slate-100 dark:border-slate-800/60 pb-2">Channels & Limits</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Active channels</label>
               <select 
                 name="active_channels"
                 value={formData.active_channels}
                 onChange={handleInputChange}
-                className="w-full flex h-10 rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 dark:text-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer transition-colors"
+                className="w-full flex h-11 rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 dark:text-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer transition-colors"
               >
                 <option value="Email + LinkedIn">Email + LinkedIn</option>
                 <option value="Email Only">Email Only</option>
                 <option value="LinkedIn Only">LinkedIn Only</option>
               </select>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Daily contact limit</label>
               <Input 
                 name="daily_contact_limit"
                 value={formData.daily_contact_limit}
                 onChange={handleInputChange}
                 placeholder="e.g. 50 / day" 
-                className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
+                className="h-11 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
               />
             </div>
           </div>

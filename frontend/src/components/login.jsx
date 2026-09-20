@@ -58,7 +58,6 @@ export default function Login() {
               </p>
             </div>
 
-            {/* Added autoComplete="off" to the form */}
             <form onSubmit={handleLogin} className="space-y-6" autoComplete="off">
               {error && (
                 <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 p-3 rounded-md text-sm text-center transition-colors">
