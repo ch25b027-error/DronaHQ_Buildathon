@@ -101,7 +101,7 @@ export default function CampaignList({ campaigns, onSelect, onNew, onToggleStatu
                     id={status} 
                     checked={statusFilters.includes(status)} 
                     onCheckedChange={() => handleStatusToggle(status)}
-                    className="border-slate-300 dark:border-slate-600 data-[state=checked]:bg-sky-500 data-[state=checked]:border-sky-500 data-[state=checked]:text-white cursor-pointer"
+                    className="border-slate-800 dark:border-slate-200 bg-transparent data-[state=checked]:bg-sky-500 data-[state=checked]:border-sky-500 data-[state=checked]:text-white cursor-pointer"
                   />
                   <label htmlFor={status} className={`text-[11px] px-2 py-0.5 rounded-full flex items-center gap-1.5 font-medium cursor-pointer select-none ${getStatusColor(status)}`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${getStatusDot(status)}`}></span>

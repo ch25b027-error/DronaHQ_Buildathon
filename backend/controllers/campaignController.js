@@ -3,7 +3,7 @@ const pool = require('../db'); // Assuming db.js exports your pg pool
 const getCampaigns = async (req, res) => {
   try {
     const query = `
-      SELECT c.campaign_id, c.name, c.status, c.created_at,
+      SELECT c.campaign_id, c.name, c.status, c.created_at, c.owner, c.icp,
       COUNT(DISTINCT cp.prospect_id) AS total_prospects
       FROM campaigns c
       LEFT JOIN campaign_prospects cp ON c.campaign_id = cp.campaign_id
@@ -103,7 +103,19 @@ const updateCampaignStatus = async (req, res) => {
   }
 };
 
-// Add updateCampaignStatus to your exports
+const globalPause = async (req, res) => {
+  try {
+    // Only target 'Live' campaigns, leaving 'Draft', 'Completed', or already 'Paused' alone
+    const query = `UPDATE campaigns SET status = 'Paused' WHERE status = 'Live' RETURNING *;`;
+    const result = await pool.query(query);
+    
+    res.json({ success: true, pausedCount: result.rowCount, data: result.rows });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// Update your exports to include it
 module.exports = { 
-  getCampaigns, triggerAgent, createCampaign, getCampaignById, updateCampaign, updateCampaignStatus 
+  getCampaigns, triggerAgent, createCampaign, getCampaignById, updateCampaign, updateCampaignStatus, globalPause 
 };

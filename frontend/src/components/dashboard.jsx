@@ -6,10 +6,17 @@ import CampaignDetail from './dashboard/CampaignDetail';
 import CampaignForm from './dashboard/CampaignForm';
 
 export default function Dashnboard() {
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [currentView, setCurrentView] = useState('list');
   const [campaigns, setCampaigns] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCampaign, setSelectedCampaign] = useState(null);
+
+  useEffect(() => {
+    const triggerRefresh = () => setRefreshTrigger(prev => prev + 1);
+    window.addEventListener('refreshCampaigns', triggerRefresh);
+    return () => window.removeEventListener('refreshCampaigns', triggerRefresh);
+  }, []);
 
   // Fetch campaigns using Axios
   useEffect(() => {
@@ -20,7 +27,9 @@ export default function Dashnboard() {
           const formattedData = response.data.data.map(c => ({
             id: c.campaign_id,
             name: c.name,
-            subtitle: "Target Audience", 
+            owner: c.owner,
+            icp: c.icp,
+            subtitle: c.icp || "Target Audience", 
             status: c.status || 'Draft',
             prospects: parseInt(c.total_prospects) || 0,
             outreach: 0, 
@@ -38,7 +47,7 @@ export default function Dashnboard() {
     if (currentView === 'list') {
       fetchCampaigns();
     }
-  }, [currentView]);
+  }, [currentView, refreshTrigger]);
 
   const handleSelect = (campaign) => {
     setSelectedCampaign(campaign);

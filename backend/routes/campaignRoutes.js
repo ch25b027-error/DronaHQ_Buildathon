@@ -6,7 +6,8 @@ const {
   triggerAgent, 
   getCampaignById, 
   updateCampaign,
-  updateCampaignStatus
+  updateCampaignStatus,
+  globalPause
 } = require('../controllers/campaignController');
 const verifyToken = require('../middleware/middleware');
 
@@ -14,6 +15,7 @@ router.use(verifyToken);
 
 router.get('/', getCampaigns);
 router.post('/', createCampaign);
+router.patch('/pause-all', globalPause);
 router.get('/:id', getCampaignById); // Fetch single campaign
 router.put('/:id', updateCampaign);  // Update campaign
 router.patch('/:id/status', updateCampaignStatus);
