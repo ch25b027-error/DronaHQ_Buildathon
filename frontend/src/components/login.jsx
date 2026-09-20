@@ -33,13 +33,13 @@ export default function Login() {
     <div className="min-h-screen w-full flex bg-slate-50 text-slate-900 font-sans">
       
       <div className="hidden md:flex flex-1 items-center justify-center">
-        <div className="flex flex-wrap items-center gap-4 px-8">
+        <div className="flex flex-col items-center gap-4 px-8">
           <img 
             src="/logo.png" 
             alt="Company Logo"
-            className="h-24 rounded-2xl w-auto object-contain" 
+            className="h-18 lg:h-22 rounded-2xl w-auto object-contain" 
           />
-          <h1 className="text-3xl font-bold tracking-tight text-gray-800">Buildathon</h1>
+          <h1 className="text-4xl lg:text-5xl font-bold tracking-tight text-gray-800">Buildathon</h1>
         </div>
       </div>
 
@@ -70,7 +70,7 @@ export default function Login() {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Username"
-                  className="h-12 bg-white text-slate-900 rounded-md border border-slate-300 focus-visible:ring-2 focus-visible:ring-sky-500 placeholder:text-slate-400 text-sm px-4 shadow-sm"
+                  className="h-12 bg-white text-slate-900 rounded-md border border-slate-300 focus-visible:ring-2 focus-visible:ring-sky-500 placeholder:text-slate-400 text-md px-4 shadow-sm"
                   required
                 />
               </div>
@@ -82,7 +82,7 @@ export default function Login() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Password"
-                  className="h-12 bg-white text-slate-900 rounded-md border border-slate-300 focus-visible:ring-2 focus-visible:ring-sky-500 placeholder:text-slate-400 text-sm px-4 pr-12 shadow-sm"
+                  className="h-12 bg-white text-slate-900 rounded-md border border-slate-300 focus-visible:ring-2 focus-visible:ring-sky-500 placeholder:text-slate-400 text-md px-4 pr-12 shadow-sm"
                   required
                 />
                 <button

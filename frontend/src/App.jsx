@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Cookies from 'js-cookie';
 import Header from './components/header';
 import Footer from './components/footer';
-import Dashnboard from './components/dashnboard';
+import Dashboard from './components/dashboard';
 import Login from './components/login';
 import './App.css';
 
@@ -30,7 +30,7 @@ function App() {
                 <Header />
                 
                 <main className="grow">
-                  <Dashnboard />
+                  <Dashboard />
                 </main>
                 
                 <Footer />
