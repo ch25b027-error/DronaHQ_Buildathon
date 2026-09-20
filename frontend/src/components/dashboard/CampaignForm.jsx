@@ -66,9 +66,7 @@ export default function CampaignForm({ campaign, onCancel, onSave }) {
   };
 
   const isFormValid = isEditing 
-    ? formData.target_roles?.trim() !== '' && 
-      formData.company_criteria?.trim() !== '' && 
-      formData.value_proposition?.trim() !== ''
+    ? true // Name and all other fields are not mandatory when editing
     : formData.name?.trim() !== '' && 
       formData.owner?.trim() !== '' &&
       formData.target_roles?.trim() !== '' && 
@@ -144,43 +142,43 @@ export default function CampaignForm({ campaign, onCancel, onSave }) {
         <div className="mb-8">
           <h3 className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase mb-6 border-b border-slate-100 dark:border-slate-800/60 pb-2">Campaign Settings & ICP Configuration</h3>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
             <div className="space-y-3">
-              <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Target Role <span className="text-red-500">*</span></label>
+              <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Target Role {isEditing ? '' : <span className="text-red-500">*</span>}</label>
               <Input 
                 name="target_roles"
                 value={formData.target_roles}
                 onChange={handleInputChange}
-                placeholder='E.g., "VP of Engineering" or "Chief Financial Officer"' 
+                placeholder="e.g. VP of Engineering" 
                 className="h-11 mt-1.5 md:mt-2.5 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
               />
             </div>
             <div className="space-y-3">
-              <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Target Industry <span className="text-red-500">*</span></label>
+              <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Target Industry {isEditing ? '' : <span className="text-red-500">*</span>}</label>
               <Input 
                 name="company_criteria"
                 value={formData.company_criteria}
                 onChange={handleInputChange}
-                placeholder='E.g., "Fintech in the Series B stage"' 
+                placeholder="e.g. Fintech in the Series B stage" 
                 className="h-11 mt-1.5 md:mt-2.5 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
               />
             </div>
           </div>
           
-          <div className="space-y-3 mb-6">
-            <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Value Proposition <span className="text-red-500">*</span></label>
-            <Textarea 
+          <div className="mb-4 space-y-3">
+            <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Value Proposition {isEditing ? '' : <span className="text-red-500">*</span>}</label>
+            <Textarea
               name="value_proposition"
               value={formData.value_proposition}
               onChange={handleInputChange}
-              className="w-full mt-1.5 md:mt-2.5 min-h-[100px] border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 dark:text-white px-3 py-3 text-sm focus-visible:ring-sky-500" 
-              placeholder='E.g., "Our API reduces database latency by 40%"'
+              placeholder="e.g. Our API reduces database latency by 40%"
+              className="mt-1.5 md:mt-2.5 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500 resize-none h-24"
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-3">
-              <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Agent Tone <span className="text-red-500">*</span></label>
+              <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Agent Tone</label>
               <select 
                 name="agent_tone"
                 value={formData.agent_tone}
@@ -205,6 +203,13 @@ export default function CampaignForm({ campaign, onCancel, onSave }) {
             </div>
           </div>
         </div>
+
+        {isEditing && (
+          <div className="mb-6 p-4 rounded-lg bg-sky-50 border border-sky-100 dark:bg-sky-900/10 dark:border-sky-800/30">
+            <h4 className="text-sm font-semibold text-sky-800 dark:text-sky-300">Edit Agents & Channels</h4>
+            <p className="text-xs text-sky-600 dark:text-sky-400 mt-1">You can dynamically change which AI agents run and what channels they use for this specific campaign.</p>
+          </div>
+        )}
 
         <div className="mb-6">
           <h3 className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase mb-6 border-b border-slate-100 dark:border-slate-800/60 pb-2">Agents Enabled</h3>

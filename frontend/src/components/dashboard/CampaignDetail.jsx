@@ -98,7 +98,7 @@ export default function CampaignDetail({ campaign, onBack, onEdit, onToggleStatu
                 Resume
               </Button>
             )}
-            <Button variant="outline" onClick={onEdit} className="border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium px-5 h-9">
+            <Button variant="outline" onClick={onEdit} title="You can edit channel and agent here" className="border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium px-5 h-9">
               Edit
             </Button>
           </div>
