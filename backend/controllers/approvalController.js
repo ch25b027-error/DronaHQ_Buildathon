@@ -37,8 +37,10 @@ const updateApproval = async (req, res) => {
 
     // 3. FIRE THE REAL EMAIL TO INBOX!
     if (status === 'approved' && draft) {
-      // Create a dummy prospect email if one doesn't exist in DB
-      const mockEmail = `${draft.prospect_name.replace(/\s+/g, '.').toLowerCase()}@${draft.prospect_company.replace(/\s+/g, '').toLowerCase()}.com`;
+      // Create a dummy prospect email safely by stripping punctuation
+      const cleanName = draft.prospect_name.replace(/[^a-zA-Z0-9]/g, '.').replace(/\.+/g, '.').toLowerCase();
+      const cleanCompany = draft.prospect_company.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+      const mockEmail = `${cleanName}@${cleanCompany}.com`;
       
       await sendDemoEmail({
         toEmail: mockEmail,

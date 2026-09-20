@@ -123,9 +123,9 @@ export default function ApprovalQueue() {
           </p>
         </Card>
       ) : (
-        <div className="flex flex-col md:flex-row gap-6 h-[calc(100vh-220px)] min-h-[500px]">
+        <div className="flex flex-col md:flex-row gap-6 md:h-[calc(100vh-220px)] md:min-h-[500px]">
           {/* Sidebar List */}
-          <Card className="w-full md:w-1/3 flex flex-col overflow-hidden border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+          <Card className="w-full md:w-1/3 flex flex-col overflow-hidden border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm max-h-[250px] md:max-h-none">
             <div className="p-4 border-b border-slate-100 dark:border-slate-800/60 bg-slate-50 dark:bg-slate-950/50">
               <h3 className="font-semibold text-slate-900 dark:text-slate-100">Pending Review ({approvals.length})</h3>
             </div>
@@ -152,7 +152,7 @@ export default function ApprovalQueue() {
 
           {/* Editor Pane */}
           {selectedApproval && (
-            <Card className="flex-1 flex flex-col overflow-hidden border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+            <Card className="flex-1 flex flex-col overflow-hidden border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm min-h-[500px] md:min-h-0">
               <div className="p-6 border-b border-slate-100 dark:border-slate-800/60 flex justify-between items-center bg-white dark:bg-slate-900">
                 <div>
                   <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Draft for {selectedApproval.prospect_name}</h2>

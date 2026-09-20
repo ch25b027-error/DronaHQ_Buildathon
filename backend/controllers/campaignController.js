@@ -66,26 +66,45 @@ const createCampaign = async (req, res) => {
   try {
     const { 
       name, owner, description, icp, geography, target_roles, 
-      company_criteria, exclusion_criteria, daily_contact_limit, status 
+      target_role, target_industry, // <-- Added new form fields
+      company_criteria, exclusion_criteria, daily_contact_limit, status,
+      agents, active_channels, value_proposition, agent_tone
     } = req.body;
 
     const query = `
       INSERT INTO campaigns (
         name, owner, description, icp, geography, target_roles, 
-        company_criteria, exclusion_criteria, daily_contact_limit, status
+        target_role, target_industry, // <-- Added to columns
+        company_criteria, exclusion_criteria, daily_contact_limit, status,
+        agents, active_channels, value_proposition, agent_tone
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
       RETURNING *;
     `;
     
     const values = [
-      name, owner, description, icp, geography, target_roles, 
-      company_criteria, exclusion_criteria, daily_contact_limit, status || 'Draft'
+      name, 
+      owner, 
+      description, 
+      icp, 
+      geography, 
+      target_roles, 
+      target_role || '', // Added value
+      target_industry || '', // Added value
+      company_criteria, 
+      exclusion_criteria, 
+      daily_contact_limit, 
+      status || 'Draft',
+      agents || [], 
+      active_channels || 'Email + LinkedIn', 
+      value_proposition || '', 
+      agent_tone || 'Professional & Direct'
     ];
     
     const result = await pool.query(query, values);
     res.json({ success: true, data: result.rows[0] });
   } catch (err) {
+    console.error("Error creating campaign:", err);
     res.status(500).json({ success: false, error: err.message });
   }
 };
@@ -108,16 +127,24 @@ const getCampaignById = async (req, res) => {
 const updateCampaign = async (req, res) => {
   try {
     const { id } = req.params;
-    const { agents, active_channels, daily_contact_limit, status } = req.body;
+    const { agents, active_channels, daily_contact_limit, status, target_roles, company_criteria, value_proposition, agent_tone } = req.body;
 
     const query = `
       UPDATE campaigns 
-      SET agents = $1, active_channels = $2, daily_contact_limit = $3, status = COALESCE($4, status)
-      WHERE campaign_id = $5
+      SET 
+        agents = COALESCE($1, agents), 
+        active_channels = COALESCE($2, active_channels), 
+        daily_contact_limit = COALESCE($3, daily_contact_limit), 
+        status = COALESCE($4, status),
+        target_roles = COALESCE($5, target_roles),
+        company_criteria = COALESCE($6, company_criteria),
+        value_proposition = COALESCE($7, value_proposition),
+        agent_tone = COALESCE($8, agent_tone)
+      WHERE campaign_id = $9
       RETURNING *;
     `;
     
-    const values = [agents || [], active_channels, daily_contact_limit, status, id];
+    const values = [agents || [], active_channels, daily_contact_limit, status, target_roles, company_criteria, value_proposition, agent_tone, id];
     
     const result = await pool.query(query, values);
     res.json({ success: true, data: result.rows[0] });
@@ -186,8 +213,16 @@ const getCampaignIntelligence = async (req, res) => {
     
     // Map database counts to standard funnel order
     const stages = ['Discovered', 'Researched', 'Qualified', 'Contacted', 'Engaged', 'Meeting', 'Opportunity'];
+    const exactCounts = {};
+    funnelQuery.rows.forEach(row => { exactCounts[row.funnel_stage || 'Discovered'] = parseInt(row.count); });
+    
+    // Calculate cumulative counts (waterfall) from bottom to top
     const stageCounts = {};
-    funnelQuery.rows.forEach(row => { stageCounts[row.funnel_stage || 'Discovered'] = parseInt(row.count); });
+    let cumulative = 0;
+    for (let i = stages.length - 1; i >= 0; i--) {
+      cumulative += (exactCounts[stages[i]] || 0);
+      stageCounts[stages[i]] = cumulative;
+    }
     
     let maxCount = 1;
     const funnelData = stages.map(stage => {
@@ -205,10 +240,7 @@ const getCampaignIntelligence = async (req, res) => {
       time: v.status === 'active' ? `activated ${formatTimeAgo(new Date(v.created_at))}` : formatTimeAgo(new Date(v.created_at))
     }));
 
-    const contactedCount = (stageCounts['Contacted'] || 0) + 
-                           (stageCounts['Engaged'] || 0) + 
-                           (stageCounts['Meeting'] || 0) + 
-                           (stageCounts['Opportunity'] || 0);
+    const contactedCount = stageCounts['Contacted'] || 0;
 
     const channelData = [
       { label: 'Email', value: contactedCount, max: Math.max(100, contactedCount) },

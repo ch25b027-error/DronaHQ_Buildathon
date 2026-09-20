@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 import { ChevronLeft, Loader2 } from 'lucide-react';
 import api from '../utils/axios';
 
@@ -23,7 +24,8 @@ export default function CampaignForm({ campaign, onCancel, onSave }) {
   const [formData, setFormData] = useState({
     name: '', owner: '', description: '', icp: '', geography: '', 
     target_roles: '', company_criteria: '', exclusion_criteria: '', 
-    daily_contact_limit: '', active_channels: 'Email + LinkedIn'
+    daily_contact_limit: '', active_channels: 'Email + LinkedIn',
+    value_proposition: '', agent_tone: 'Professional & Direct'
   });
 
   const [enabledAgents, setEnabledAgents] = useState(availableAgents.slice(0, 4));
@@ -38,7 +40,9 @@ export default function CampaignForm({ campaign, onCancel, onSave }) {
               ...prev,
               ...dbData,
               daily_contact_limit: dbData.daily_contact_limit || '',
-              active_channels: dbData.active_channels || 'Email + LinkedIn'
+              active_channels: dbData.active_channels || 'Email + LinkedIn',
+              value_proposition: dbData.value_proposition || '',
+              agent_tone: dbData.agent_tone || 'Professional & Direct'
             }));
             if (dbData.agents && dbData.agents.length > 0) {
               setEnabledAgents(dbData.agents);
@@ -61,7 +65,18 @@ export default function CampaignForm({ campaign, onCancel, onSave }) {
     );
   };
 
+  const isFormValid = isEditing 
+    ? formData.target_roles?.trim() !== '' && 
+      formData.company_criteria?.trim() !== '' && 
+      formData.value_proposition?.trim() !== ''
+    : formData.name?.trim() !== '' && 
+      formData.owner?.trim() !== '' &&
+      formData.target_roles?.trim() !== '' && 
+      formData.company_criteria?.trim() !== '' && 
+      formData.value_proposition?.trim() !== '';
+
   const handleSubmit = (isDraft) => {
+    if (!isFormValid) return;
     const payload = {
       ...formData,
       id: campaign?.id,
@@ -99,104 +114,97 @@ export default function CampaignForm({ campaign, onCancel, onSave }) {
       <Card className="p-6 md:p-8 shadow-sm border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors">
         
         {!isEditing && (
-          <>
-            <div className="mb-8">
-              <h3 className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase mb-6 border-b border-slate-100 dark:border-slate-800/60 pb-2">Identity</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-                <div className="space-y-3">
-                  <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Campaign name</label>
-                  <Input 
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    placeholder="e.g. US SaaS CTO Outreach" 
-                    className="h-11 mt-1.5 md:mt-2.5  bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
-                  />
-                </div>
-                <div className="space-y-3">
-                  <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Owner</label>
-                  <Input 
-                    name="owner"
-                    value={formData.owner}
-                    onChange={handleInputChange}
-                    placeholder="e.g. you" 
-                    className="h-11 mt-1.5 md:mt-2.5 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
-                  />
-                </div>
-              </div>
-              
+          <div className="mb-8">
+            <h3 className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase mb-6 border-b border-slate-100 dark:border-slate-800/60 pb-2">Identity & Base Info</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
               <div className="space-y-3">
-                <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Description</label>
-                <textarea 
-                  name="description"
-                  value={formData.description}
+                <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Campaign name <span className="text-red-500">*</span></label>
+                <Input 
+                  name="name"
+                  value={formData.name}
                   onChange={handleInputChange}
-                  className="w-full mt-1.5 md:mt-2.5 flex min-h-25 rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 dark:text-white px-3 py-3 text-sm placeholder:text-slate-400 dark:placeholder:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 resize-none shadow-sm transition-colors" 
-                  placeholder="One or two lines on the objective of this campaign."
+                  placeholder="e.g. US SaaS CTO Outreach" 
+                  className="h-11 mt-1.5 md:mt-2.5 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
                 />
               </div>
-            </div>
-
-            <div className="mb-8">
-              <h3 className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase mb-6 border-b border-slate-100 dark:border-slate-800/60 pb-2">Targeting</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-                <div className="space-y-3">
-                  <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">ICP</label>
-                  <Input 
-                    name="icp"
-                    value={formData.icp}
-                    onChange={handleInputChange}
-                    placeholder="e.g. SaaS company CTOs" 
-                    className="h-11 mt-1.5 md:mt-2.5 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
-                  />
-                </div>
-                <div className="space-y-3">
-                  <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Geography</label>
-                  <Input 
-                    name="geography"
-                    value={formData.geography}
-                    onChange={handleInputChange}
-                    placeholder="e.g. United States" 
-                    className="h-11 mt-1.5 md:mt-2.5 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
-                  />
-                </div>
-                <div className="space-y-3">
-                  <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Target roles</label>
-                  <Input 
-                    name="target_roles"
-                    value={formData.target_roles}
-                    onChange={handleInputChange}
-                    placeholder="e.g. CTO, VP Engineering" 
-                    className="h-11 mt-1.5 md:mt-2.5 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
-                  />
-                </div>
-                <div className="space-y-3">
-                  <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Company criteria</label>
-                  <Input 
-                    name="company_criteria"
-                    value={formData.company_criteria}
-                    onChange={handleInputChange}
-                    placeholder="e.g. 50–500 employees" 
-                    className="h-11 mt-1.5 md:mt-2.5 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
-                  />
-                </div>
-              </div>
-              
               <div className="space-y-3">
-                <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Exclusion criteria</label>
+                <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Owner <span className="text-red-500">*</span></label>
                 <Input 
-                  name="exclusion_criteria"
-                  value={formData.exclusion_criteria}
+                  name="owner"
+                  value={formData.owner}
                   onChange={handleInputChange}
-                  placeholder="e.g. existing customers, competitors" 
+                  placeholder="e.g. you" 
                   className="h-11 mt-1.5 md:mt-2.5 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
                 />
               </div>
             </div>
-          </>
+          </div>
         )}
+
+        <div className="mb-8">
+          <h3 className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase mb-6 border-b border-slate-100 dark:border-slate-800/60 pb-2">Campaign Settings & ICP Configuration</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="space-y-3">
+              <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Target Role <span className="text-red-500">*</span></label>
+              <Input 
+                name="target_roles"
+                value={formData.target_roles}
+                onChange={handleInputChange}
+                placeholder='E.g., "VP of Engineering" or "Chief Financial Officer"' 
+                className="h-11 mt-1.5 md:mt-2.5 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
+              />
+            </div>
+            <div className="space-y-3">
+              <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Target Industry <span className="text-red-500">*</span></label>
+              <Input 
+                name="company_criteria"
+                value={formData.company_criteria}
+                onChange={handleInputChange}
+                placeholder='E.g., "Fintech in the Series B stage"' 
+                className="h-11 mt-1.5 md:mt-2.5 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
+              />
+            </div>
+          </div>
+          
+          <div className="space-y-3 mb-6">
+            <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Value Proposition <span className="text-red-500">*</span></label>
+            <Textarea 
+              name="value_proposition"
+              value={formData.value_proposition}
+              onChange={handleInputChange}
+              className="w-full mt-1.5 md:mt-2.5 min-h-[100px] border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 dark:text-white px-3 py-3 text-sm focus-visible:ring-sky-500" 
+              placeholder='E.g., "Our API reduces database latency by 40%"'
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+            <div className="space-y-3">
+              <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Agent Tone <span className="text-red-500">*</span></label>
+              <select 
+                name="agent_tone"
+                value={formData.agent_tone}
+                onChange={handleInputChange}
+                className="w-full mt-1.5 md:mt-2.5 flex h-11 rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 dark:text-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer transition-colors"
+              >
+                <option value="Professional & Direct">Professional & Direct</option>
+                <option value="Casual & Friendly">Casual & Friendly</option>
+                <option value="Urgent">Urgent</option>
+                <option value="Consultative">Consultative</option>
+              </select>
+            </div>
+            <div className="space-y-3">
+              <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Geography (Optional)</label>
+              <Input 
+                name="geography"
+                value={formData.geography}
+                onChange={handleInputChange}
+                placeholder="e.g. United States" 
+                className="h-11 mt-1.5 md:mt-2.5 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
+              />
+            </div>
+          </div>
+        </div>
 
         <div className="mb-6">
           <h3 className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase mb-6 border-b border-slate-100 dark:border-slate-800/60 pb-2">Agents Enabled</h3>
@@ -226,7 +234,7 @@ export default function CampaignForm({ campaign, onCancel, onSave }) {
           </div>
         </div>
 
-        <div className="mb-8">
+        <div className="mb-6">
           <h3 className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase mb-6 border-b border-slate-100 dark:border-slate-800/60 pb-2">Channels & Limits</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-3">
@@ -235,7 +243,7 @@ export default function CampaignForm({ campaign, onCancel, onSave }) {
                 name="active_channels"
                 value={formData.active_channels}
                 onChange={handleInputChange}
-                className="w-full flex h-11 rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 dark:text-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer transition-colors"
+                className="w-full mt-1.5 md:mt-2.5 flex h-11 rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 dark:text-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer transition-colors"
               >
                 <option value="Email + LinkedIn">Email + LinkedIn</option>
                 <option value="Email Only">Email Only</option>
@@ -249,7 +257,7 @@ export default function CampaignForm({ campaign, onCancel, onSave }) {
                 value={formData.daily_contact_limit}
                 onChange={handleInputChange}
                 placeholder="e.g. 50 / day" 
-                className="h-11 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
+                className="h-11 mt-1.5 md:mt-2.5 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600 focus-visible:ring-sky-500" 
               />
             </div>
           </div>
@@ -260,11 +268,11 @@ export default function CampaignForm({ campaign, onCancel, onSave }) {
             Cancel
           </Button>
           {!isEditing && (
-            <Button variant="outline" onClick={() => handleSubmit(true)} className="border-slate-200 dark:border-slate-800 dark:bg-transparent dark:text-slate-300 dark:hover:bg-slate-800 shadow-sm">
+            <Button variant="outline" onClick={() => handleSubmit(true)} disabled={!isFormValid} className="border-slate-200 dark:border-slate-800 dark:bg-transparent dark:text-slate-300 dark:hover:bg-slate-800 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
               Save as draft
             </Button>
           )}
-          <Button onClick={() => handleSubmit(false)} className="bg-sky-500 hover:bg-sky-600 text-white shadow-sm border-0">
+          <Button onClick={() => handleSubmit(false)} disabled={!isFormValid} className="bg-sky-500 hover:bg-sky-600 text-white shadow-sm border-0 disabled:opacity-50 disabled:cursor-not-allowed">
             {isEditing ? 'Save changes' : 'Activate campaign'}
           </Button>
         </div>

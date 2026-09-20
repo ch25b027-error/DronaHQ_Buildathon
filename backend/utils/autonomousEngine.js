@@ -28,24 +28,36 @@ const runAutonomousCycle = async () => {
       const prospect = prospectsQuery.rows[0];
       console.log(`🤖 [AI Engine] Processing prospect: ${prospect.name} at ${prospect.company}`);
 
+      const enabledAgents = campaign.agents || [];
+      const activeChannels = campaign.active_channels || "Email + LinkedIn";
+      const isEmailEnabled = activeChannels.includes("Email");
+
       // 1. Run Research Enricher
       const sourceData = [{ source: "fixture:crm", text: `${prospect.company} is a fast-growing tech company.` }];
-      const campaignIcp = campaign.icp_json ? JSON.parse(campaign.icp_json) : { criteria: [], exclusions: [] };
+      const campaignIcp = {
+        criteria: [
+          { text: campaign.company_criteria || "B2B SaaS company", must_have: true },
+          { text: campaign.target_roles || "VP Engineering or CTO", must_have: true }
+        ],
+        exclusions: [campaign.exclusion_criteria || "Competitors"]
+      };
 
-      const enrichResult = await callAgent({
-        url: process.env.AGENT_URL_ENRICH,
-        key: process.env.AGENT_KEY_ENRICH,
-        message: `Prospect (raw): ${JSON.stringify(prospect)}\nSource data: ${JSON.stringify(sourceData)}`,
-        fallback: { status: "insufficient_data" }
-      });
-
-      if (!enrichResult.ok) continue;
+      let enrichResult = { ok: true, data: { status: "sufficient_data", profile_summary: "", contact_details: {}, firmographics: {} } };
+      if (enabledAgents.includes('Lead Research & Enrichment Agent')) {
+        enrichResult = await callAgent({
+          url: process.env.AGENT_URL_ENRICH,
+          key: process.env.AGENT_KEY_ENRICH,
+          message: `Prospect (raw): ${JSON.stringify(prospect)}\nSource data: ${JSON.stringify(sourceData)}`,
+          fallback: { status: "insufficient_data" }
+        });
+        if (!enrichResult.ok) continue;
+      }
 
       const icpPayload = prepareIcpCall(prospect, sourceData, enrichResult.data, campaignIcp, "1.0.0");
       let finalDecision = "needs_review";
 
       // 2. Run ICP Fitment Agent
-      if (icpPayload.should_call_icp) {
+      if (icpPayload.should_call_icp && enabledAgents.includes('ICP Fitment Agent')) {
         const icpResult = await callAgent({
           url: process.env.AGENT_URL_ICP,
           key: process.env.AGENT_KEY_ICP,
@@ -55,17 +67,33 @@ const runAutonomousCycle = async () => {
         if (icpResult.ok && icpResult.data.decision) finalDecision = icpResult.data.decision;
       }
 
-      // 3. Run Personalisation Agent to draft the email!
-      console.log(`✍️ [AI Engine] Running Personalisation Agent for ${prospect.name}...`);
-      const personalisationResult = await callAgent({
-        url: process.env.AGENT_URL_PERSONALISE,
-        key: process.env.AGENT_KEY_PERSONALISE,
-        message: `Prospect: ${JSON.stringify(icpPayload.prospect)}\nStrategy decision: {"channel":"email","action":"contact_now"}\nKnowledge snippets: [{"source":"case_study:acme","text":"Our platform saves engineering teams 30% on infrastructure costs."}]\nCampaign tone: "consultative"`,
-        fallback: { status: "escalate", body: `Hi ${prospect.name},\n\nSaw you're leading engineering at ${prospect.company}. Would love to connect about infrastructure optimization.` }
-      });
+      // If Email is completely disabled for this campaign, we don't process emails.
+      // (In a full app, we would branch to LinkedIn processing here instead)
+      if (!isEmailEnabled) {
+        console.log(`⏭️ [AI Engine] Skipping ${prospect.name} as Email channel is not selected.`);
+        continue; 
+      }
 
-      const emailBody = personalisationResult.data?.body || `Hi ${prospect.name}, caught your profile at ${prospect.company}. Let's connect!`;
-      const subjectLine = personalisationResult.data?.subject || `Scaling engineering at ${prospect.company}`;
+      // 3. Run Personalisation Agent to draft the email!
+      let emailBody = `Hi ${prospect.name}, caught your profile at ${prospect.company}. Let's connect!`;
+      let subjectLine = `Scaling engineering at ${prospect.company}`;
+
+      if (enabledAgents.includes('Personalisation / Email Agent')) {
+        console.log(`✍️ [AI Engine] Running Personalisation Agent for ${prospect.name}...`);
+        
+        const valProp = campaign.value_proposition || "Our platform saves engineering teams 30% on infrastructure costs.";
+        const tone = campaign.agent_tone || "consultative";
+
+        const personalisationResult = await callAgent({
+          url: process.env.AGENT_URL_PERSONALISE,
+          key: process.env.AGENT_KEY_PERSONALISE,
+          message: `Prospect: ${JSON.stringify(icpPayload.prospect)}\nStrategy decision: {"channel":"email","action":"contact_now"}\nKnowledge snippets: [{"source":"value_prop","text":"${valProp}"}]\nCampaign tone: "${tone}"`,
+          fallback: { status: "escalate", body: `Hi ${prospect.name},\n\nSaw you're leading engineering at ${prospect.company}. Would love to connect.` }
+        });
+
+        emailBody = personalisationResult.data?.body || emailBody;
+        subjectLine = personalisationResult.data?.subject || subjectLine;
+      }
 
       // 4. CHECK IF HUMAN-IN-THE-LOOP IS ENABLED
       const settingsQuery = await pool.query("SELECT value FROM app_settings WHERE key = 'human_in_the_loop'");
@@ -88,12 +116,14 @@ const runAutonomousCycle = async () => {
         const logMessage = `Drafted outreach for ${prospect.name} and added to Approval Queue.`;
         await pool.query(
           'INSERT INTO agent_logs (campaign_id, agent_name, action_text) VALUES ($1, $2, $3)',
-          [campaign.campaign_id, 'Personalisation Agent', logMessage]
+          [campaign.campaign_id, 'System', logMessage]
         );
         console.log(`✅ [AI Engine] Draft added to queue for ${prospect.name}`);
       } else {
         // SEND DIRECTLY
-        const mockEmail = `${prospect.name.replace(/\s+/g, '.').toLowerCase()}@${prospect.company.replace(/\s+/g, '').toLowerCase()}.com`;
+        const cleanName = prospect.name.replace(/[^a-zA-Z0-9]/g, '.').replace(/\.+/g, '.').toLowerCase();
+        const cleanCompany = prospect.company.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        const mockEmail = `${cleanName}@${cleanCompany}.com`;
         await sendDemoEmail({
           toEmail: mockEmail,
           subject: subjectLine,
@@ -109,7 +139,7 @@ const runAutonomousCycle = async () => {
         const logMessage = `Sent AI outreach email to ${prospect.name} (${prospect.company}) automatically.`;
         await pool.query(
           'INSERT INTO agent_logs (campaign_id, agent_name, action_text) VALUES ($1, $2, $3)',
-          [campaign.campaign_id, 'Personalisation Agent', logMessage]
+          [campaign.campaign_id, 'System', logMessage]
         );
         console.log(`✅ [AI Engine] Outreach automatically sent to ${prospect.name}`);
       }
@@ -121,7 +151,7 @@ const runAutonomousCycle = async () => {
 
 const startEngine = () => {
   console.log("🚀 Autonomous AI SDR Engine Initialized with Nodemailer integration.");
-  setInterval(runAutonomousCycle, 10 * 60 * 1000); // Checks every 15 minutes
+  setInterval(runAutonomousCycle, 1 * 60 * 1000); // Checks every 15 minutes
 };
 
 module.exports = { startEngine };
